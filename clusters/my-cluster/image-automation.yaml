@@ -1,4 +1,4 @@
-apiVersion: image.toolkit.fluxcd.io/v1beta2
+apiVersion: image.toolkit.fluxcd.io/v1
 kind: ImageRepository
 metadata:
   name: course-app
@@ -7,7 +7,7 @@ spec:
   image: viktor1sss/course-app
   interval: 1m0s
 ---
-apiVersion: image.toolkit.fluxcd.io/v1beta2
+apiVersion: image.toolkit.fluxcd.io/v1
 kind: ImagePolicy
 metadata:
   name: course-app-dev
@@ -22,7 +22,7 @@ spec:
     pattern: "^dev-(?P<ts>.*)$"
     extract: "$ts"
 ---
-apiVersion: image.toolkit.fluxcd.io/v1beta2
+apiVersion: image.toolkit.fluxcd.io/v1
 kind: ImagePolicy
 metadata:
   name: course-app-prod
@@ -37,7 +37,7 @@ spec:
     pattern: "^prod-(?P<ts>.*)$"
     extract: "$ts"
 ---
-apiVersion: image.toolkit.fluxcd.io/v1beta1
+apiVersion: image.toolkit.fluxcd.io/v1
 kind: ImageUpdateAutomation
 metadata:
   name: course-app-automation
