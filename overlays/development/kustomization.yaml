@@ -13,6 +13,19 @@ patches:
       - op: replace
         path: /spec/replicas
         value: 1
+      - op: replace
+        path: /spec/template/spec/containers/0/image
+        value: viktor1sss/course-app:dev-latest # {"$imagepolicy": "flux-system:course-app-dev"}
+  - target:
+      kind: Ingress
+      name: course-app-ingress
+    patch: |-
+      - op: replace
+        path: /spec/rules/0/host
+        value: course-app.dev.local
+      - op: replace
+        path: /spec/tls/0/hosts/0
+        value: course-app.dev.local
 configMapGenerator:
   - name: course-app-config
     behavior: merge

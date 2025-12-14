@@ -1,0 +1,63 @@
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImageRepository
+metadata:
+  name: course-app
+  namespace: flux-system
+spec:
+  image: viktor1sss/course-app
+  interval: 1m0s
+---
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImagePolicy
+metadata:
+  name: course-app-dev
+  namespace: flux-system
+spec:
+  imageRepositoryRef:
+    name: course-app
+  policy:
+    semver:
+      range: ">=0.0.0-dev"
+  filterTags:
+    pattern: "^dev-(?P<ts>.*)$"
+    extract: "$ts"
+---
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImagePolicy
+metadata:
+  name: course-app-prod
+  namespace: flux-system
+spec:
+  imageRepositoryRef:
+    name: course-app
+  policy:
+    semver:
+      range: ">=0.0.0-prod"
+  filterTags:
+    pattern: "^prod-(?P<ts>.*)$"
+    extract: "$ts"
+---
+apiVersion: image.toolkit.fluxcd.io/v1beta1
+kind: ImageUpdateAutomation
+metadata:
+  name: course-app-automation
+  namespace: flux-system
+spec:
+  interval: 1m0s
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  git:
+    checkout:
+      ref:
+        branch: main
+    commit:
+      author:
+        email: fluxcdbot@users.noreply.github.com
+        name: fluxcdbot
+      messageTemplate: "{{range .Updated.Images}}{{println .}}{{end}}"
+    push:
+      branch: main
+  update:
+    path: ./overlays
+    strategy: Setters
