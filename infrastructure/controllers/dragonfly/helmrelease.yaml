@@ -1,0 +1,19 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: dragonfly-operator
+  namespace: dragonfly-system
+spec:
+  releaseName: dragonfly-operator
+  chart:
+    spec:
+      chart: dragonfly-operator
+      sourceRef:
+        kind: HelmRepository
+        name: dragonfly-operator
+        namespace: flux-system
+  interval: 1h0m0s
+  install:
+    createNamespace: true
+  upgrade:
+    install: true
