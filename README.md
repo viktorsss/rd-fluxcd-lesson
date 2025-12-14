@@ -124,4 +124,19 @@ dragonfly        ClusterIP   10.43.15.153   <none>        6379/TCP   7s
 ```
 ## Опціонально: "Чистий" GitOps
 
-Якщо хочете "чистий" GitOps, налаштуйте встановлення самого Dragonfly Operator через Flux. Для цього в окремій папці (наприклад `infrastructure/controllers/dragonfly`) створіть **HelmRepository** (джерело чарту оператора) та **HelmRelease** (інсталяція оператора).
+
+1.  **HelmRepository**:
+    *   URL: `oci://ghcr.io/dragonflydb/dragonfly-operator/helm`
+    *   Type: `oci`
+2.  **HelmRelease**:
+    *   Chart: `dragonfly-operator`
+    *   Version: `v1.3.1` (важливо вказати конкретну версію для OCI)
+3.  **Kustomization**:
+    *   Створено `infrastructure` Kustomization, який синхронизує папку `infrastructure/controllers/dragonfly`.
+
+Перевірка статусу оператора:
+```bash
+flux get helmreleases -n dragonfly-system
+NAME                    REVISION        SUSPENDED       READY   MESSAGE                                                                                                        
+dragonfly-operator      v1.3.1          False           True    Helm install succeeded for release dragonfly-system/dragonfly-operator.v1 with chart dragonfly-operator@v1.3.1
+```
