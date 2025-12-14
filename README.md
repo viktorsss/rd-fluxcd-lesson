@@ -1,54 +1,79 @@
-# GitOps with Flux and Kustomize
+# GitOps з Flux та Kustomize
 
-## Project Structure
+## Структура Проєкту
 
-This repository is structured to support GitOps deployments using Flux and Kustomize.
+Цей репозиторій організовано для підтримки GitOps розгортання з використанням Flux та Kustomize.
 
 ```
-├── base/                   # Shared manifests (Deployment, Service, Ingress, ConfigMap)
+├── base/                   # Спільні маніфести (Deployment, Service, Ingress, ConfigMap)
 ├── overlays/
-│   ├── development/        # Dev environment specific configuration (1 replica, Dragonfly DB instance)
-│   └── production/         # Prod environment specific configuration (3 replicas, Dragonfly Cluster, HPA)
+10: │   ├── development/        # Конфігурація для Dev середовища (1 репліка, Dragonfly DB instance)
+11: │   └── production/         # Конфігурація для Prod середовища (3 репліки, Dragonfly Cluster, HPA)
 └── clusters/
-    └── my-cluster/         # Flux configurations (GitRepository, Kustomizations)
+    └── my-cluster/         # Конфігурації Flux (GitRepository, Kustomizations, ImageAutomation)
 ```
 
-## Environments
+## Середовища
 
 ### Development
 - **Namespace:** `development`
-- **Replicas:** 1
-- **Database:** Dragonfly (Single Instance)
-- **Install:** Automatically managed by Flux (`apps-dev` Kustomization).
+- **Репліки:** 1
+- **База даних:** Dragonfly (Одиночний інстанс)
+- **Інсталяція:** Автоматично керується Flux (`apps-dev` Kustomization).
+- **Політика оновлення:** Автоматично оновлюється при появі нових тегів `dev-*` в Docker Hub.
 
 ### Production
 - **Namespace:** `production`
-- **Replicas:** 3
-- **Database:** Dragonfly (Replica Set, 2 replicas)
-- **Scaling:** HPA enabled (scale 3-10 replicas based on CPU)
-- **Install:** Automatically managed by Flux (`apps-prod` Kustomization).
+- **Репліки:** 3
+- **База даних:** Dragonfly (Replica Set, 2 репліки)
+- **Масштабування:** Увімкнено HPA (масштабування 3-10 реплік на основі CPU)
+- **Інсталяція:** Автоматично керується Flux (`apps-prod` Kustomization).
+- **Політика оновлення:** Автоматично оновлюється при появі нових тегів `prod-*` в Docker Hub.
 
-## Flux Setup
+## Налаштування Flux
 
-Flux monitors the `clusters/my-cluster` directory. It automatically applies:
+Flux відстежує директорію `clusters/my-cluster`. Він автоматично застосовує:
 
-1.  `app-dev.yaml` -> Syncs `overlays/development` to the `development` namespace.
-2.  `app-prod.yaml` -> Syncs `overlays/production` to the `production` namespace.
+1.  `app-dev.yaml` -> Синхронізує `overlays/development` у простір імен `development`.
+2.  `app-prod.yaml` -> Синхронізує `overlays/production` у простір імен `production`.
 
-### Prerequisites
+### Автоматизація оновлення імеджів (Image Automation)
+
+Налаштовано автоматичне стеження за новими версіями Docker-імеджів:
+
+1.  **ImageRepository**: Flux регулярно сканує Docker Hub (`viktor1sss/course-app`).
+2.  **ImagePolicy**:
+    *   `course-app-dev`: Відбирає теги, що відповідають шаблону `dev-*` (сортування за SemVer).
+    *   `course-app-prod`: Відбирає теги, що відповідають шаблону `prod-*`.
+3.  **ImageUpdateAutomation**:
+    *   Якщо знайдено нову версію, яка відповідає політиці, Flux **автоматично робить коміт** у цей Git-репозиторій, оновлюючи поле `newTag` у файлах `kustomization.yaml`.
+    *   Після коміту Flux застосовує зміни до кластера.
+
+> [!IMPORTANT]
+> Для роботи автоматизації (запису в Git), Deploy Key, який використовує Flux, **мусить мати права на запис (Write access)**.
+
+Перевірка статусу імеджів:
+```bash
+flux get image repository -A
+flux get image policy -A
+flux get image update -A
+```
+
+## Вимоги
+
 - Kubernetes Cluster
-- Flux installed and bootstrapped
-- Dragonfly Operator installed (manually or via Flux)
+- Flux встановлено та налаштовано (bootstrapped)
+- Dragonfly Operator встановлено
 
-### Verification
+## Перевірка
 
-Check the status of Flux Kustomizations:
+Перевірити статус синхронізації Kustomizations:
 
 ```bash
 flux get kustomizations
 ```
 
-Check the application pods:
+Перевірити поди додатку:
 
 ```bash
 kubectl get pods -n development

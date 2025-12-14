@@ -25,8 +25,7 @@ patches:
         value: course-app.dev.local
 images:
   - name: viktor1sss/course-app
-    newName: viktor1sss/course-app
-    newTag: viktor1sss/course-app:dev-v1.0.4 # {"$imagepolicy": "flux-system:course-app-dev"}
+    newTag: dev-v1.0.4 # {"$imagepolicy": "flux-system:course-app-dev:tag"}
 configMapGenerator:
   - name: course-app-config
     behavior: merge
