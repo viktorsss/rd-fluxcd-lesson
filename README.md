@@ -6,11 +6,12 @@
 
 ```
 ├── base/                   # Спільні маніфести (Deployment, Service, Ingress, ConfigMap)
+├── infrastructure/         # Маніфести для інфраструктури (Dragonfly Operator)
 ├── overlays/
-10: │   ├── development/        # Конфігурація для Dev середовища (1 репліка, Dragonfly DB instance)
-11: │   └── production/         # Конфігурація для Prod середовища (3 репліки, Dragonfly Cluster, HPA)
+│   ├── development/        # Конфігурація для Dev середовища (1 репліка, Dragonfly DB instance)
+│   └── production/         # Конфігурація для Prod середовища (3 репліки, Dragonfly Cluster, HPA)
 └── clusters/
-    └── my-cluster/         # Конфігурації Flux (GitRepository, Kustomizations, ImageAutomation)
+    └── my-cluster/         # Конфігурації Flux (GitRepository, Kustomizations, ImageAutomation, Infrastructure)
 ```
 
 ## Середовища
@@ -38,6 +39,8 @@ Flux відстежує директорію `clusters/my-cluster`. Він ав�
 
 1.  `app-dev.yaml` -> Синхронізує `overlays/development` у простір імен `development`.
 2.  `app-prod.yaml` -> Синхронізує `overlays/production` у простір імен `production`.
+3.  `infrastructure.yaml` -> Синхронізує `infrastructure` у простір імен `flux-system`.
+4.  `image-automation.yaml` -> Синхронізує `image-automation` у простір імен `flux-system`.
 
 
 ### Автоматизація оновлення імеджів (Image Automation)
@@ -80,11 +83,12 @@ flux-system     course-app-automation   2025-12-14T17:43:13+02:00       False   
 Перевірємо статус синхронізації Kustomizations:
 
 ```bash
-flux get kustomizations
-NAME            REVISION                SUSPENDED       READY   MESSAGE                              
-app-dev         main@sha1:e5910832      False           True    Applied revision: main@sha1:e5910832
-app-prod        main@sha1:e5910832      False           True    Applied revision: main@sha1:e5910832
-flux-system     main@sha1:e5910832      False           True    Applied revision: main@sha1:e5910832
+flux get kustomizations -A
+NAMESPACE       NAME            REVISION                SUSPENDED       READY   MESSAGE                              
+flux-system     app-dev         main@sha1:a30a68e6      False           True    Applied revision: main@sha1:a30a68e6
+flux-system     app-prod        main@sha1:a30a68e6      False           True    Applied revision: main@sha1:a30a68e6
+flux-system     flux-system     main@sha1:a30a68e6      False           True    Applied revision: main@sha1:a30a68e6
+flux-system     infrastructure  main@sha1:a30a68e6      False           True    Applied revision: main@sha1:a30a68e6
 ```
 
 Перевіряємо поди додатку:
