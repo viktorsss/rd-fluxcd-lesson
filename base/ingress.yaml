@@ -4,7 +4,7 @@ metadata:
   name: course-app-ingress
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: web, websecure
-    traefik.ingress.kubernetes.io/router.middlewares: default-course-app-redirect-https@kubernetescrd
+
 spec:
   tls:
     - hosts:
