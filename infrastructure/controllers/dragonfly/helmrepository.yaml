@@ -6,4 +6,4 @@ metadata:
 spec:
   interval: 1h0m0s
   type: oci
-  url: oci://ghcr.io/dragonflydb/dragonfly-operator/helm
+  url: oci://ghcr.io/dragonflydb/dragonfly-operator/helm/helm
