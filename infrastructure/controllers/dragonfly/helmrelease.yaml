@@ -15,5 +15,3 @@ spec:
   interval: 1h0m0s
   install:
     createNamespace: true
-  upgrade:
-    install: true
