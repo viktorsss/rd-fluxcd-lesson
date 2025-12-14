@@ -14,9 +14,6 @@ patches:
       - op: replace
         path: /spec/replicas
         value: 3
-      - op: replace
-        path: /spec/template/spec/containers/0/image
-        value: viktor1sss/course-app:prod-latest # {"$imagepolicy": "flux-system:course-app-prod"}
   - target:
       kind: Ingress
       name: course-app-ingress
@@ -27,6 +24,10 @@ patches:
       - op: replace
         path: /spec/tls/0/hosts/0
         value: course-app.prod.local
+images:
+  - name: viktor1sss/course-app
+    newName: viktor1sss/course-app
+    newTag: prod-latest # {"$imagepolicy": "flux-system:course-app-prod"}
 configMapGenerator:
   - name: course-app-config
     behavior: merge
